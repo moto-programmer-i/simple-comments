@@ -3,7 +3,7 @@
  * Plugin Name: Simple Comments
  * Description: 返信のみのシンプルなコメントプラグイン
  * Author: 元プログラマi
- * License: GPLv2
+ * License: WTFPL
  * Version: 1.0.0
  */
 if(!defined('ABSPATH')) { exit; } // 直接URLを入力してのアクセスを防ぐ
