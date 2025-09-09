@@ -1,4 +1,5 @@
 課題
+    nonceの比較忘れた
     サニタイズ
     二重submit問題 onsubmitでdisabledできない？
     jsファイルのバージョン設定

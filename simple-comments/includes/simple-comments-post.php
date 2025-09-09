@@ -39,9 +39,13 @@ nocache_headers();
 // 仮
 $ip = "192";
 
+// / が \/ になっているので、バックスラッシュを取り除く
+$postdata = wp_unslash( $_POST );
+
 // nonceチェック
 SimpleComments_NonceManager::delete_expired();
-if (is_null(SimpleComments_NonceManager::get_nonce($ip))) {
+$nonce = SimpleComments_NonceManager::get_nonce($ip);
+if (is_null($nonce) || $nonce != $postdata[SimpleComments_NonceManager::POST_KEY]) {
 	// 403 Forbidden
 	$waitSeconds = 1;
 
@@ -67,7 +71,7 @@ echo "ok";
 exit;
 
 
-echo '受信： ' . $_POST['nonce'];
+// echo '受信： ' . $_POST['nonce'];
 // staticでも値の受け渡しができない
 
 
@@ -77,9 +81,6 @@ exit;
 // POSTされたデータは$_POSTに連想配列で入ってる
 // echo json_encode($_POST, JSON_PRETTY_PRINT);
 
-
-// / が \/ になっているので、バックスラッシュを取り除く
-$postdata = wp_unslash( $_POST );
 
 global $wpdb;
 
