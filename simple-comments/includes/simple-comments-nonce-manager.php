@@ -8,7 +8,6 @@ if (!class_exists( 'SimpleComments_NonceManager' ) ) {
     // https://developer.wordpress.org/apis/security/nonces/
     const LIFETIME_HOURS = 12;
     const DATETIME_FORMAT = 'Y-m-d H:i:s';
-    const POST_KEY = 'nonce';
     
     static public function create_expires_datetime() {
       return (new DateTime('now', new DateTimeZone('UTC')))->sub(DateInterval::createFromDateString(self::LIFETIME_HOURS . ' hours'));

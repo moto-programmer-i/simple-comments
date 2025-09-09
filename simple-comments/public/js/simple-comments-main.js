@@ -47,9 +47,8 @@ async function insert_comments_html() {
 
     // <input type="hidden" name="comment_parent" id="comment_parent" value="0">
     const parent = document.createElement("input");
-    parent.name = "comment_parent";
+    parent.name = "parent";
     parent.type = "hidden"
-    parent.value = 0;
     form.appendChild(parent);
 
     const nonce = document.createElement("input");

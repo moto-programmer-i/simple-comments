@@ -15,7 +15,7 @@ CREATE TABLE `simple_comments` (
   `date_utc` datetime NOT NULL DEFAULT UTC_TIMESTAMP(),
   `content` text NOT NULL,
   `agent` varchar(255) NOT NULL DEFAULT '',
-  `parent` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
+  `parent` bigint(20) UNSIGNED,
     PRIMARY KEY (`id`, `post_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

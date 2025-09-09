@@ -30,8 +30,10 @@ if ( 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
 $wp_path = preg_replace( '/wp-content.*$/', '', __DIR__ );
 require_once( $wp_path . 'wp-load.php' );
 
-// SimpleComments_NonceManagerの読み込み
+require_once( plugin_dir_path( __FILE__ ) . 'simple-comments-constants.php');
+require_once( plugin_dir_path( __FILE__ ) . 'simple-comments-utils.php');
 require_once( plugin_dir_path( __FILE__ ) . 'simple-comments-nonce-manager.php');
+
 
 
 nocache_headers();
@@ -39,18 +41,22 @@ nocache_headers();
 // 仮
 $ip = "192";
 
+// POSTされたデータは$_POSTに連想配列で入ってる
+// echo json_encode($_POST, JSON_PRETTY_PRINT);
+
 // / が \/ になっているので、バックスラッシュを取り除く
 $postdata = wp_unslash( $_POST );
+
+// パラメータのないURLを作成しておく
+$location = preg_replace( '/\?.*$/', '', $_SERVER['HTTP_REFERER']);
 
 // nonceチェック
 SimpleComments_NonceManager::delete_expired();
 $nonce = SimpleComments_NonceManager::get_nonce($ip);
-if (is_null($nonce) || $nonce != $postdata[SimpleComments_NonceManager::POST_KEY]) {
+if (is_null($nonce) || $nonce != $postdata[SimpleComments_Constants::NONCE]) {
 	// 403 Forbidden
 	$waitSeconds = 1;
 
-	// パラメータを付け直す
-	$location = preg_replace( '/\?.*$/', '', $_SERVER['HTTP_REFERER']);
 	header("Location: " . $location, true, 403);
 	echo "申し訳ありませんが、ページの有効期限が切れました。もう1度お試しください。
 		<br>
@@ -59,7 +65,7 @@ if (is_null($nonce) || $nonce != $postdata[SimpleComments_NonceManager::POST_KEY
 	echo "
 		<script>
 			setTimeout(() => {
-				window.location = '". $location . "?comment=" . $_POST['content']. "';
+				window.location = '". $location . "?comment=" . $_POST[SimpleComments_Constants::CONTENT]. "';
 			}, ${waitSeconds}000);
 			
 		</script>
@@ -67,36 +73,56 @@ if (is_null($nonce) || $nonce != $postdata[SimpleComments_NonceManager::POST_KEY
 	exit;
 }
 
-echo "ok";
-exit;
-
-
 // echo '受信： ' . $_POST['nonce'];
 // staticでも値の受け渡しができない
-
-
-exit;
-
-
-// POSTされたデータは$_POSTに連想配列で入ってる
-// echo json_encode($_POST, JSON_PRETTY_PRINT);
 
 
 global $wpdb;
 
 $wpdb->show_errors();
 
+
+
+
+// URL例
+// http://www.failure4.shop/success-laugh/contact
+$post_id = SimpleComments_Constants::POST_ID_CONTACT;
+// http://www.failure4.shop/success-laugh/privacy-policy
+if (str_contains($_SERVER['HTTP_REFERER'], "privacy-policy")) {
+    $post_id = SimpleComments_Constants::POST_ID_PRIVACY_POLICY;
+}
+else {
+	// http://www.failure4.shop/success-laugh/archives/1
+	$post_id = preg_replace( '/.*archives\/(\d+).*/', '$1', $_SERVER['HTTP_REFERER']);
+	if (is_numeric($post_id)) {
+		$post_id = intval($post_id);
+	}
+	else {
+		echo "post_idが不正です。<br>
+		post_id: $post_id
+		";
+		exit;
+	}
+}
+
+// parentが送信されなかった場合、空文字扱いになのでNULLに変換が必要
+if (empty($postdata[SimpleComments_Constants::PARENT])) {
+	$postdata[SimpleComments_Constants::PARENT] = NULL;
+}
+
+
+
 // https://developer.wordpress.org/reference/classes/wpdb/insert/
 $result = $wpdb->insert(
 	'simple_comments',
 	array(
-        'post_id' => 0,
-		// サニタイズが必要
-        'content' => 'サニタイズが必要',// $postdata['content'],
-		// author_ip
-		'parent_id' => $postdata['parent_id'],
+        SimpleComments_Constants::POST_ID => $post_id,
+		SimpleComments_Constants::AUTHOR_IP => SimpleComments_Utils::sanitize($ip),
+        SimpleComments_Constants::CONTENT => SimpleComments_Utils::sanitize($postdata[SimpleComments_Constants::CONTENT]),
+		// agent
+		SimpleComments_Constants::PARENT => $postdata[SimpleComments_Constants::PARENT],
     ),
-	array( '%d', '%s', '%d')
+	array( '%d', '%s', '%s', '%d')
 );
 
 // エラーを出力
@@ -105,8 +131,8 @@ if (!$result ) {
 	exit;
 }
 
-// 新しいID
-echo $wpdb->insert_id;
+wp_safe_redirect($location);
+
 
 exit;
 
@@ -130,45 +156,6 @@ if ( is_wp_error( $comment ) ) {
 */
 
 
-// $user            = wp_get_current_user();
-// $cookies_consent = ( isset( $_POST['wp-comment-cookies-consent'] ) );
-
-/**
- * Fires after comment cookies are set.
- *
- * @since 3.4.0
- * @since 4.9.6 The `$cookies_consent` parameter was added.
- *
- * @param WP_Comment $comment         Comment object.
- * @param WP_User    $user            Comment author's user object. The user may not exist.
- * @param bool       $cookies_consent Comment author's consent to store cookies.
- */
-// do_action( 'set_comment_cookies', $comment, $user, $cookies_consent );
-
-// $location = empty( $_POST['redirect_to'] ) ? get_comment_link( $comment ) : $_POST['redirect_to'] . '#comment-' . $comment->comment_ID;
-
-/*
-// If user didn't consent to cookies, add specific query arguments to display the awaiting moderation message.
-if ( ! $cookies_consent && 'unapproved' === wp_get_comment_status( $comment ) && ! empty( $comment->comment_author_email ) ) {
-	$location = add_query_arg(
-		array(
-			'unapproved'      => $comment->comment_ID,
-			'moderation-hash' => wp_hash( $comment->comment_date_gmt ),
-		),
-		$location
-	);
-}
-*/
-
-/**
- * Filters the location URI to send the commenter after posting.
- *
- * @since 2.0.5
- *
- * @param string     $location The 'redirect_to' URI sent via $_POST.
- * @param WP_Comment $comment  Comment object.
- */
-// $location = apply_filters( 'comment_post_redirect', $location, $comment );
 
 // wp_safe_redirect( $location );
 exit;
