@@ -31,32 +31,66 @@ function getPostId() {
     return postId;
 }
 
-function getComments(postId) {
+function getComments(postId, form) {
     // https://ja.wordpress.org/team/handbook/plugin-development/javascript/summary/#jquery
     $.get(objFromPHP.getCommentUrl + "&post_id=" + postId, function(commentsStr) {
         comments = JSON.parse(commentsStr);
         // simple-comments.phpの $get_comments参照
-        const main = document.getElementById("main");
         const commentDiv = document.createElement("div");
         commentDiv.classList.add("simple-comments");
 
-        // コメント欄作成
+        
+        const idMap = new Map();
+        const topLevelComments = new Array();
         for(let comment of comments) {
-            const div = document.createElement("div");
+            comment.wrapper = document.createElement("div");
+            comment.wrapper.classList.add("wrapper");
 
-            // radio コメント内容と表示する
+            // コメントの行作成
+            comment.line = document.createElement("div");
+            comment.line.classList.add("line");
             const radio = document.createElement("input");
             radio.type = "radio";
             radio.name = "parent";
             radio.value = comment.id;
-            div.appendChild(radio);
+            comment.line.appendChild(radio);
             const content = document.createElement("div");
             content.innerText = comment.content;
-            div.appendChild(content);
-            
-            commentDiv.appendChild(div);
+            comment.line.appendChild(content);
+            comment.wrapper.appendChild(comment.line);
+
+            // 返信の構造作成
+            comment.children = new Array();
+            idMap.set(comment.id, comment);
+            if (comment.parent) {
+                const parent = idMap.get(comment.parent);
+                if (parent) {
+                    parent.wrapper.appendChild(comment.wrapper);
+                }
+            }
+            else {
+                topLevelComments.push(comment);
+            }
         }
-        main.appendChild(commentDiv);
+
+        // 返信なし作成
+        const noReplyLine = document.createElement("div");
+        noReplyLine.classList.add("line");
+        const noReply = document.createElement("input");
+        noReply.type = "radio";
+        noReply.name = "parent";
+        noReply.value = null;
+        noReplyLine.appendChild(noReply);
+        const noReplyLabel = document.createElement("div");
+        noReplyLabel.innerText = "返信なし（下のコメントのボタンを選択すると返信になります）";
+        noReplyLine.appendChild(noReplyLabel);
+        commentDiv.appendChild(noReplyLine);
+
+        // コメント欄作成
+        for(let comment of topLevelComments) {
+            commentDiv.appendChild(comment.wrapper);
+        }
+        form.appendChild(commentDiv);
     });
     
 }
@@ -113,5 +147,5 @@ async function insertCommentsHtml() {
     main.appendChild(div);
 
     // URLから取得
-    getComments(getPostId());
+    getComments(getPostId(), form);
 }

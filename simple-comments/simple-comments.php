@@ -23,7 +23,7 @@ if (!class_exists( 'SimpleComments_Plugin' ) ) {
         'the_content',
         
         function() {
-          // Javascriptと連携。参考
+          // Javascriptと連携
           // https://ja.wordpress.org/team/handbook/plugin-development/javascript/summary/
           wp_enqueue_script(
             self::SCRIPT_NAME,
@@ -36,6 +36,14 @@ if (!class_exists( 'SimpleComments_Plugin' ) ) {
               'strategy' => 'defer',
             )
           );
+
+          // CSSと連携
+          // https://developer.wordpress.org/reference/functions/wp_enqueue_style/
+          wp_enqueue_style(
+            self::CSS_NAME,
+            plugins_url('public/css/simple-comments.css', __FILE__ ),
+          );
+          
 
           // nonceの種はランダムでなければならない
           // https://developer.wordpress.org/reference/functions/wp_create_nonce/
@@ -103,6 +111,7 @@ if (!class_exists( 'SimpleComments_Plugin' ) ) {
 
     const SCRIPT_NAME = 'simple-comments-main';
     const COMMENT_ACTION_NAME = 'simple_comments';
+    const CSS_NAME = 'simple-comments-css';
   }
  
   new SimpleComments_Plugin();

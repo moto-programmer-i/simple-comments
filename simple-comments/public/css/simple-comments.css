@@ -1,0 +1,14 @@
+.simple-comments {
+    /* 返信への返信への返信・・・ */
+    overflow-x: auto;
+}
+
+.simple-comments .line {
+    display: flex;
+    column-gap: 10px;
+}
+
+/* 返信 */
+.simple-comments .line .line {
+    margin-left: 20px;
+}
