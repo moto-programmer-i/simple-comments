@@ -78,7 +78,6 @@ if (is_null($nonce) || $nonce != $postdata[SimpleComments_Constants::NONCE]) {
 
 
 global $wpdb;
-
 $wpdb->show_errors();
 
 

@@ -52,15 +52,57 @@ if (!class_exists( 'SimpleComments_Plugin' ) ) {
             self::SCRIPT_NAME,
             'objFromPHP',
             array(
-              'post_url' => plugin_dir_url(__FILE__) . 'includes/simple-comments-post.php',
+              'postUrl' => plugin_dir_url(__FILE__) . 'includes/simple-comments-post.php',
               'nonce'    => $nonce,
+
+              // ajax通信時はこのURLを使わなければいけないらしい（理由は不明）
+              // https://ja.wordpress.org/team/handbook/plugin-development/javascript/ajax/#url
+              'getCommentUrl' => admin_url( "admin-ajax.php?action=" . self::COMMENT_ACTION_NAME ),
             )
           );
         }
       );
+
+      $get_comments = function () {
+        $post_id = $_GET["post_id"];
+        if (is_numeric($post_id)) {
+          $post_id = intval($post_id);
+        }
+        else {
+          wp_die( "post_idが不正です。post_id:$post_id", 400 );
+        }
+        
+        global $wpdb;
+        $wpdb->show_errors();
+
+        // https://developer.wordpress.org/reference/classes/wpdb/get_results/
+        $results = $wpdb->get_results($wpdb->prepare(
+          "SELECT id, content, parent FROM simple_comments WHERE 
+            post_id = %d",
+            // ORDER BYは横着してやらない（通常いらないはず）
+          array($post_id)));
+
+        // エラーを出力
+        if (!$results ) {
+          echo $wpdb->last_error;
+          exit;
+        }
+
+        echo json_encode($results);
+
+
+        // all ajax handlers should die when finished
+        wp_die();
+      };
+
+      // ログイン用と非ログイン用でそれぞれ登録しなければいけない
+      // https://developer.wordpress.org/reference/hooks/wp_ajax_action/
+      add_action( "wp_ajax_" . self::COMMENT_ACTION_NAME,  $get_comments);
+      add_action( "wp_ajax_nopriv_" . self::COMMENT_ACTION_NAME, $get_comments);
     }
 
     const SCRIPT_NAME = 'simple-comments-main';
+    const COMMENT_ACTION_NAME = 'simple_comments';
   }
  
   new SimpleComments_Plugin();

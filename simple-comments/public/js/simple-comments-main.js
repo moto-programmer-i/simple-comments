@@ -1,16 +1,67 @@
 // console.log(objFromPHP);
-/*
-objFromPHP: simple-comments.php内、wp_localize_scriptの
-array(
-    'post_url' => （省略）,
-    'nonce'    => （省略）,
-)
-*/
-console.log(objFromPHP.nonce);
 
-insert_comments_html();
+// objFromPHP: simple-comments.phpのwp_localize_script内参照
 
-async function insert_comments_html() {
+// console.log(objFromPHP.nonce);
+
+// simple-comments-constants.phpと二重定義になってしまっている
+// 頑張れば解決できるかもしれないが、今回は面倒なのでこれで
+const POST_ID_CONTACT = 0;
+const POST_ID_PRIVACY_POLICY = 1;
+
+insertCommentsHtml();
+
+// simple-comments-post.phpと二重定義になってしまっている
+// 頑張れば解決できるかもしれないが、今回は面倒なのでこれで
+function getPostId() {
+    let postId = POST_ID_CONTACT;
+    const url = window.location.toString();
+    // http://www.failure4.shop/success-laugh/privacy-policy
+    if (url.includes("privacy-policy")) {
+        return POST_ID_PRIVACY_POLICY;
+    }
+    else {
+        // http://www.failure4.shop/success-laugh/archives/1
+        postId = parseInt(url.replace( /.*archives\/(\d+).*/, "$1"));
+        if (isNaN(postId)) {
+            alert("post_idが不正です：" + url);
+        }
+    }
+
+    return postId;
+}
+
+function getComments(postId) {
+    // https://ja.wordpress.org/team/handbook/plugin-development/javascript/summary/#jquery
+    $.get(objFromPHP.getCommentUrl + "&post_id=" + postId, function(commentsStr) {
+        comments = JSON.parse(commentsStr);
+        // simple-comments.phpの $get_comments参照
+        const main = document.getElementById("main");
+        const commentDiv = document.createElement("div");
+        commentDiv.classList.add("simple-comments");
+
+        // コメント欄作成
+        for(let comment of comments) {
+            const div = document.createElement("div");
+
+            // radio コメント内容と表示する
+            const radio = document.createElement("input");
+            radio.type = "radio";
+            radio.name = "parent";
+            radio.value = comment.id;
+            div.appendChild(radio);
+            const content = document.createElement("div");
+            content.innerText = comment.content;
+            div.appendChild(content);
+            
+            commentDiv.appendChild(div);
+        }
+        main.appendChild(commentDiv);
+    });
+    
+}
+
+async function insertCommentsHtml() {
     // console.log("comment");
     // 記事であるかチェック
     const main = document.getElementById("main");
@@ -25,7 +76,7 @@ async function insert_comments_html() {
     const form = document.createElement("form");
     form.classList.add("comment-form");
     form.method = "POST";
-    form.action = objFromPHP.post_url;
+    form.action = objFromPHP.postUrl;
     // alert(form.action);
     
     
@@ -60,4 +111,7 @@ async function insert_comments_html() {
 
     div.appendChild(form);
     main.appendChild(div);
+
+    // URLから取得
+    getComments(getPostId());
 }
