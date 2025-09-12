@@ -27,5 +27,11 @@ if (!class_exists( 'SimpleComments_Constants' ) ) {
     // で横着な対応をする。（よい子は真似しないこと）
     const POST_ID_CONTACT = 0;
     const POST_ID_PRIVACY_POLICY = 1;
+
+    // wp_postテーブル（Wordpress既存）
+    const POST_DATE = 'post_date';
+    const POST_DATE_GMT = 'post_date_gmt';
+    const POST_CONTENT = 'post_content';
+    const POST_TITLE = 'post_title';
   }
 }

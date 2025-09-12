@@ -49,3 +49,6 @@ wp-config.php
 
 #zip
 *.zip
+
+# バックアップ用一時フォルダ
+/back

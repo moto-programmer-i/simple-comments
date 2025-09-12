@@ -20,7 +20,7 @@ if (!class_exists( 'SimpleComments_Plugin' ) ) {
       add_filter(
         // イベントのタイミング
         // https://developer.wordpress.org/apis/hooks/filter-reference/
-        'the_content',
+        'wp_enqueue_script',
         
         function() {
           // Javascriptと連携
@@ -31,7 +31,7 @@ if (!class_exists( 'SimpleComments_Plugin' ) ) {
             // An array of registered script handles this script depends on.
             array(),
             // ver 後でキャッシュのために追加
-            null,
+            false,
             array(
               'strategy' => 'defer',
             )

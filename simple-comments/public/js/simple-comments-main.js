@@ -34,6 +34,9 @@ function getPostId() {
 function getComments(postId, form) {
     // https://ja.wordpress.org/team/handbook/plugin-development/javascript/summary/#jquery
     $.get(objFromPHP.getCommentUrl + "&post_id=" + postId, function(commentsStr) {
+        if (!commentsStr) {
+            return;
+        }
         comments = JSON.parse(commentsStr);
         // simple-comments.phpの $get_comments参照
         const commentDiv = document.createElement("div");

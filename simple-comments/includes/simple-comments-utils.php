@@ -14,5 +14,12 @@ if (!class_exists( 'SimpleComments_Utils' ) ) {
         // 指定したタグ以外は削除
         return wp_kses($str, self::ALLOWED_HTML);
     }
+
+    /**
+     * パラメータのないURLを作成
+     */
+    static function get_referer_url() {
+      return preg_replace( '/\?.*$/', '', $_SERVER['HTTP_REFERER']);
+    }
   }
 }

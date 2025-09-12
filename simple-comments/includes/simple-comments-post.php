@@ -9,6 +9,7 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
+// echo "準備中";exit;
 
 if ( 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
 	$protocol = $_SERVER['SERVER_PROTOCOL'];
@@ -48,30 +49,11 @@ $ip = "192";
 $postdata = wp_unslash( $_POST );
 
 // パラメータのないURLを作成しておく
-$location = preg_replace( '/\?.*$/', '', $_SERVER['HTTP_REFERER']);
+$location = SimpleComments_Utils::get_referer_url();
 
 // nonceチェック
 SimpleComments_NonceManager::delete_expired();
-$nonce = SimpleComments_NonceManager::get_nonce($ip);
-if (is_null($nonce) || $nonce != $postdata[SimpleComments_Constants::NONCE]) {
-	// 403 Forbidden
-	$waitSeconds = 1;
-
-	header("Location: " . $location, true, 403);
-	echo "申し訳ありませんが、ページの有効期限が切れました。もう1度お試しください。
-		<br>
-		${waitSeconds}秒後に自動的にリダイレクトされます。";
-
-	echo "
-		<script>
-			setTimeout(() => {
-				window.location = '". $location . "?comment=" . $_POST[SimpleComments_Constants::CONTENT]. "';
-			}, ${waitSeconds}000);
-			
-		</script>
-		";
-	exit;
-}
+SimpleComments_NonceManager::redirect_if_invalid($ip, $location, "?comment=" . $_POST[SimpleComments_Constants::CONTENT]);
 
 // echo '受信： ' . $_POST['nonce'];
 // staticでも値の受け渡しができない
