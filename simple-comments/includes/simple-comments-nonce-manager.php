@@ -75,13 +75,13 @@ if (!class_exists( 'SimpleComments_NonceManager' ) ) {
         header("Location: " . $location, true, 403);
         echo "申し訳ありませんが、ページの有効期限が切れました。もう1度お試しください。
           <br>
-          ${waitSeconds}秒後に自動的にリダイレクトされます。";
+          {$waitSeconds}秒後に自動的にリダイレクトされます。";
 
         echo "
           <script>
             setTimeout(() => {
               window.location = '$location" . "$parameter';
-            }, ${waitSeconds}000);
+            }, {$waitSeconds}000);
             
           </script>
           ";
