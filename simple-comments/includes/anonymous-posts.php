@@ -1,9 +1,13 @@
 <?php
+// 確認用URL
+// http://www.failure4.shop/success-laugh/wp-content/plugins/simple-comments/includes/anonymous-posts.php
+
+// 本当はこの投稿機能はプラグインを分けるべきだが、今回は面倒なのでそのままいく
+
 // フォームの要素の名前
 const CONTENT = "content";
 const LEARN = "learn";
-// 確認用URL
-// http://www.failure4.shop/success-laugh/wp-content/plugins/simple-comments/includes/anonymous-posts.php
+
 
 // Sets up the WordPress Environment.
 // https://github.com/WordPress/wordpress-develop/blob/6.8.2/src/wp-comments-post.php
