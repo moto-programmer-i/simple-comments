@@ -111,6 +111,8 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] ) {
 			display: flex;
 			flex-direction: column;
 			row-gap: 20px;
+			justify-content: center;
+			align-items: center;
 		}
 		input {
 			width: 100%;
@@ -126,6 +128,9 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] ) {
 		.content {
 			height: 70vh;
 		}
+		.submit-area {
+			width: 40%;
+		}
 	</style>
 </head>
 	<body>
@@ -134,7 +139,7 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] ) {
 			<textarea id="content" name="content" class="content" required placeholder="失敗談"></textarea>
 			<textarea id="learn" name="learn" rows="3" required placeholder="・学び（箇条書き推奨）"></textarea>
             <input type="hidden" name="nonce" value="<?php echo SimpleComments_NonceManager::create_nonce('192');?>">
-			<div>
+			<div class="submit-area">
 				<input type="submit" class="submit" value="失敗談を投稿">
 			</div>
         </form>
