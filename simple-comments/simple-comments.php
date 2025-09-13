@@ -23,7 +23,13 @@ if (!class_exists( 'SimpleComments_Plugin' ) ) {
         'wp_enqueue_script',
         
         function() {
-          // Javascriptと連携
+          // 固定ページや記事でなければ何もしない
+          if(!is_page() && !is_single()) {
+            return;
+          }
+
+
+          // コメント機能追加
           // https://ja.wordpress.org/team/handbook/plugin-development/javascript/summary/
           wp_enqueue_script(
             self::SCRIPT_NAME,
