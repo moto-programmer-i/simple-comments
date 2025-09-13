@@ -59,7 +59,7 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] ) {
 */
     $post_content = "
     <p>". SimpleComments_Utils::sanitize($postdata[CONTENT]) . "</p>
-    <h2 class=\"wp-block-heading\">学び</h2>
+    <h2 class=\"wp-block-heading\">この失敗からの学び</h2>
     <p>". SimpleComments_Utils::sanitize($postdata[LEARN]) . "</p>"
     ;
 
@@ -129,14 +129,41 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] ) {
 	</style>
 </head>
 	<body>
-		<form method="POST" action="">
-            <input name="post_title" class="title" required placeholder="タイトル">
-			<textarea name="content" class="content" required placeholder="失敗談"></textarea>
-			<textarea name="learn" rows="3" required placeholder="・学び（箇条書き推奨）"></textarea>
+		<form method="POST" action="" onSubmit="return onSubmit();">
+            <input id="post_title" name="post_title" class="title" required placeholder="タイトル">
+			<textarea id="content" name="content" class="content" required placeholder="失敗談"></textarea>
+			<textarea id="learn" name="learn" rows="3" required placeholder="・学び（箇条書き推奨）"></textarea>
             <input type="hidden" name="nonce" value="<?php echo SimpleComments_NonceManager::create_nonce('192');?>">
 			<div>
 				<input type="submit" class="submit" value="失敗談を投稿">
 			</div>
         </form>
 	</body>
+	<script>
+		// インラインだとdeferが効かないらしい
+		// もう面倒なのでここに書く
+		
+		// 2回書くのが面倒だが、対応策不明
+		const POST_TITLE = "post_title";
+		const CONTENT = "content";
+		const LEARN = "learn";
+		
+		// nonceエラー時の復元
+		const params = new URLSearchParams(window.location.search);
+		if(params.get("restore")) {
+			document.getElementById(POST_TITLE).value = sessionStorage.getItem(POST_TITLE);	
+			document.getElementById(CONTENT).value = sessionStorage.getItem(CONTENT);
+			document.getElementById(LEARN).value = sessionStorage.getItem(LEARN);	
+		}
+		
+		
+        function onSubmit() {
+			// nonceエラーに備えて保存
+			sessionStorage.setItem(POST_TITLE, document.getElementById(POST_TITLE).value);
+			sessionStorage.setItem(CONTENT, document.getElementById(CONTENT).value);
+			sessionStorage.setItem(LEARN, document.getElementById(LEARN).value);
+			
+            return confirm('投稿後の変更はできません。よろしいですか？');
+        }
+    </script>
 </html>

@@ -53,7 +53,7 @@ $location = SimpleComments_Utils::get_referer_url();
 
 // nonceチェック
 SimpleComments_NonceManager::delete_expired();
-SimpleComments_NonceManager::redirect_if_invalid($ip, $location, "?comment=" . $_POST[SimpleComments_Constants::CONTENT]);
+SimpleComments_NonceManager::redirect_if_invalid($ip, $location, "?restore=true");
 
 // echo '受信： ' . $_POST['nonce'];
 // staticでも値の受け渡しができない

@@ -9,6 +9,11 @@
 const POST_ID_CONTACT = 0;
 const POST_ID_PRIVACY_POLICY = 1;
 
+const CONTENT = "content";
+
+// IDが他と被っているので変更
+const CONTENT_ID = "simple-comments-content";
+
 insertCommentsHtml();
 
 // simple-comments-post.phpと二重定義になってしまっている
@@ -119,12 +124,19 @@ async function insertCommentsHtml() {
     
     // <textarea id="comment" name="comment" cols="45" rows="8" maxlength="65525" required="required"></textarea>
     const textarea = document.createElement("textarea");
-    textarea.name = "content";
+    textarea.id = CONTENT_ID;
+    textarea.name = CONTENT;
     textarea.cols = 45;
-    textarea.rows = 8;
+    textarea.rows = 4;
     textarea.maxLength = 65525;
     textarea.required = true;
     form.appendChild(textarea);
+
+    // nonceエラー時の復元
+    const params = new URLSearchParams(window.location.search);
+    if(params.get("restore")) {
+        textarea.value = sessionStorage.getItem(CONTENT_ID);
+    }
 
     // <input name="submit" type="submit" id="submit" class="submit" value="コメントを送信"></input>
     const button = document.createElement("input");
@@ -144,6 +156,11 @@ async function insertCommentsHtml() {
     nonce.type = "hidden"
     nonce.value = objFromPHP.nonce;
     form.appendChild(nonce);
+
+    // nonceエラーに備えて保存
+    form.onsubmit = (event) => {
+        sessionStorage.setItem(CONTENT_ID, document.getElementById(CONTENT_ID).value);
+    };
     
 
     div.appendChild(form);
