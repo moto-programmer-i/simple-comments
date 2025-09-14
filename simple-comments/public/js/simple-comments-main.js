@@ -25,7 +25,7 @@ function getPostId() {
     if (url.includes("privacy-policy")) {
         return POST_ID_PRIVACY_POLICY;
     }
-    else {
+    else if(url.includes("archives")) {
         // http://www.failure4.shop/success-laugh/archives/1
         postId = parseInt(url.replace( /.*archives\/(\d+).*/, "$1"));
         if (isNaN(postId)) {
