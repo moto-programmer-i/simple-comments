@@ -1,0 +1,2 @@
+ /public_html/success-laugh/wp-admin/user-new.php
+    echo "無効"; exit;
