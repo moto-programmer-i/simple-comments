@@ -1,1 +1,4 @@
 ALTER TABLE テーブル名 AUTO_INCREMENT = 1;
+
+投稿メニュー
+<span style="color: #1967d2; text-decoration: underline;"><i class="fa fa-comment" aria-hidden="true"></i>失敗を投稿</span>
