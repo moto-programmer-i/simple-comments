@@ -99,7 +99,7 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] ) {
 <head>
 	<!-- Wordpressの機能を使ってCSSを適用するのが推奨らしいが、面倒なのでこれで -->
     <link rel="stylesheet" id="cocoon-style-css" href="/success-laugh/wp-content/themes/cocoon-master/style.css?ver=6.8.2&amp;fver=20250901031631" media="all">
-	<title>失敗談を投稿</title>
+	<title>失敗を投稿</title>
 	<style type="text/css">
 		* {
 			font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
@@ -116,6 +116,7 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] ) {
 		}
 		input {
 			width: 100%;
+			font-size: xx-large;
 		}
 		textarea {
 			font-size: xx-large;
@@ -129,7 +130,7 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] ) {
 			height: 70vh;
 		}
 		.submit-area {
-			width: 40%;
+			width: 90%;
 		}
 	</style>
 	<link rel="icon" href="/success-laugh/wp-content/uploads/2025/09/%E5%A4%B1%E6%95%97-150x150.jpg" sizes="32x32">
@@ -140,11 +141,11 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] ) {
 	<body>
 		<form method="POST" action="" onSubmit="return onSubmit();">
             <input id="post_title" name="post_title" class="title" required placeholder="タイトル">
-			<textarea id="content" name="content" class="content" required placeholder="失敗談"></textarea>
+			<textarea id="content" name="content" class="content" required placeholder="失敗した話"></textarea>
 			<textarea id="learn" name="learn" rows="3" required placeholder="・学び（箇条書き推奨）"></textarea>
             <input type="hidden" name="nonce" value="<?php echo SimpleComments_NonceManager::create_nonce('192');?>">
 			<div class="submit-area">
-				<input type="submit" class="submit" value="失敗談を投稿">
+				<input type="submit" class="submit" value="失敗を投稿">
 			</div>
         </form>
 	</body>
