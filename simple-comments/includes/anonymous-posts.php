@@ -132,6 +132,10 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] ) {
 			width: 40%;
 		}
 	</style>
+	<link rel="icon" href="/success-laugh/wp-content/uploads/2025/09/%E5%A4%B1%E6%95%97-150x150.jpg" sizes="32x32">
+	<link rel="icon" href="/success-laugh/wp-content/uploads/2025/09/%E5%A4%B1%E6%95%97-300x300.jpg" sizes="192x192">
+	<meta name="msapplication-TileImage" content="/success-laugh/wp-content/uploads/2025/09/失敗-300x300.jpg">
+
 </head>
 	<body>
 		<form method="POST" action="" onSubmit="return onSubmit();">
