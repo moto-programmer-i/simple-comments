@@ -6,6 +6,7 @@
 
 // simple-comments-constants.phpと二重定義になってしまっている
 // 頑張れば解決できるかもしれないが、今回は面倒なのでこれで
+const POST_ID_NONE = -1;
 const POST_ID_CONTACT = 0;
 const POST_ID_PRIVACY_POLICY = 1;
 
@@ -19,10 +20,14 @@ insertCommentsHtml();
 // simple-comments-post.phpと二重定義になってしまっている
 // 頑張れば解決できるかもしれないが、今回は面倒なのでこれで
 function getPostId() {
-    let postId = POST_ID_CONTACT;
+    let postId = POST_ID_NONE;
     const url = window.location.toString();
+    // 固定ページが増える度に追加しなければならないのが課題
+    if (url.includes("contact")) {
+        return POST_ID_CONTACT;
+    }
     // http://www.failure4.shop/success-laugh/privacy-policy
-    if (url.includes("privacy-policy")) {
+    else if (url.includes("privacy-policy")) {
         return POST_ID_PRIVACY_POLICY;
     }
     else if(url.includes("archives")) {
@@ -104,10 +109,15 @@ function getComments(postId, form) {
 }
 
 async function insertCommentsHtml() {
+    const postId = getPostId();
+    if (postId == POST_ID_NONE) {
+        return;
+    }
+
     // console.log("comment");
     // 記事であるかチェック
     const main = document.getElementById("main");
-    if(!main || document.getElementsByClassName("post").length <= 0) {
+    if(!main) {
         return;
     }
     const div = document.createElement("div");
@@ -167,5 +177,5 @@ async function insertCommentsHtml() {
     main.appendChild(div);
 
     // URLから取得
-    getComments(getPostId(), form);
+    getComments(postId, form);
 }
