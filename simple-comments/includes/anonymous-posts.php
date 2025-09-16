@@ -1,6 +1,6 @@
 <?php
 // 確認用URL
-// http://www.failure4.shop/success-laugh/wp-content/plugins/simple-comments/includes/anonymous-posts.php
+// https://www.failure4.shop/success-laugh/wp-content/plugins/simple-comments/includes/anonymous-posts.php
 
 // 本当はこの投稿機能はプラグインを分けるべきだが、今回は面倒なのでそのままいく
 
@@ -30,7 +30,8 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] ) {
     $postdata = wp_unslash( $_POST );
     
     // 仮
-    $ip = "192";
+    // $ip = "192";
+	$ip = SimpleComments_Utils::get_ip_address();
 
     // パラメータのないURLを作成しておく
     $location = SimpleComments_Utils::get_referer_url();
@@ -67,16 +68,14 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] ) {
     $result = $wpdb->insert(
         'wp_posts',
         array(
-            // https://developer.wordpress.org/reference/functions/current_time/
-            // もう面倒なのでUtilは作らない
-            SimpleComments_Constants::POST_DATE => current_time("mysql", false),
-            SimpleComments_Constants::POST_DATE_GMT => current_time("mysql", true),
+            SimpleComments_Constants::POST_DATE => SimpleComments_Utils::current_db_date(),
+            SimpleComments_Constants::POST_DATE_GMT => SimpleComments_Utils::current_db_date_gmt(),
             SimpleComments_Constants::POST_CONTENT => $post_content,
             SimpleComments_Constants::POST_TITLE => SimpleComments_Utils::sanitize($postdata[SimpleComments_Constants::POST_TITLE]),
-            SimpleComments_Constants::AUTHOR_IP => SimpleComments_Utils::sanitize($ip)
-            // agent
+            SimpleComments_Constants::AUTHOR_IP => $ip,
+			SimpleComments_Constants::AGENT => SimpleComments_Utils::get_user_agent()
         ),
-        array('%s', '%s', '%s', '%s', '%s')
+        array('%s', '%s', '%s', '%s', '%s', '%s')
     );
 
     // エラーを出力
@@ -143,7 +142,7 @@ if ( 'POST' == $_SERVER['REQUEST_METHOD'] ) {
             <input id="post_title" name="post_title" class="title" required placeholder="タイトル">
 			<textarea id="content" name="content" class="content" required placeholder="失敗した話"></textarea>
 			<textarea id="learn" name="learn" rows="3" required placeholder="・学び（箇条書き推奨）"></textarea>
-            <input type="hidden" name="nonce" value="<?php echo SimpleComments_NonceManager::create_nonce('192');?>">
+            <input type="hidden" name="nonce" value="<?php echo SimpleComments_NonceManager::get_or_create_nonce(SimpleComments_Utils::get_ip_address());?>">
 			<div class="submit-area">
 				<input type="submit" class="submit" value="失敗を投稿">
 			</div>

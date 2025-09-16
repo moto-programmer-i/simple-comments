@@ -11,16 +11,18 @@ if(!defined('ABSPATH')) { exit; } // 直接URLを入力してのアクセスを�
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
+require_once( plugin_dir_path( __FILE__ ) . '/includes/simple-comments-utils.php');
 require_once( plugin_dir_path( __FILE__ ) . '/includes/simple-comments-nonce-manager.php');
 
 if (!class_exists( 'SimpleComments_Plugin' ) ) {
   class SimpleComments_Plugin {
     function __construct() {
-      
-      add_filter(
+      // error_log('pre add_action');
+      add_action(
         // イベントのタイミング
         // https://developer.wordpress.org/apis/hooks/filter-reference/
-        'wp_enqueue_script',
+        // ここはsがいる、関数はwp_enqueue_scriptなのに
+        'wp_enqueue_scripts',
         
         function() {
           // 固定ページや記事でなければ何もしない
@@ -53,10 +55,7 @@ if (!class_exists( 'SimpleComments_Plugin' ) ) {
 
           // nonceの種はランダムでなければならない
           // https://developer.wordpress.org/reference/functions/wp_create_nonce/
-           $nonce = SimpleComments_NonceManager::create_nonce(
-            // 仮
-            '192'
-           );
+           $nonce = SimpleComments_NonceManager::get_or_create_nonce(SimpleComments_Utils::get_ip_address());
           
           // PHPではstaticの値は保存されない
           // SimpleComments_NonceManager::$STATE = 192;

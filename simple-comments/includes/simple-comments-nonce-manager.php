@@ -6,17 +6,24 @@ if (!class_exists( 'SimpleComments_NonceManager' ) ) {
   class SimpleComments_NonceManager {
     // nonceの有効期限。wordpressのものと合わせた
     // https://developer.wordpress.org/apis/security/nonces/
-    const LIFETIME_HOURS = 12;
+    const LIFETIME_HOURS = 24;
+    const RECREATE_HOURS = 12;
     const DATETIME_FORMAT = 'Y-m-d H:i:s';
-    
-    static public function create_expires_datetime() {
-      return (new DateTime('now', new DateTimeZone('UTC')))->sub(DateInterval::createFromDateString(self::LIFETIME_HOURS . ' hours'));
-    }
+
     // DBの文字列形式で期限切れ日時を返す
     // https://mariadb.com/docs/server/reference/data-types/date-and-time-data-types/datetime
-    static public function create_expires_datetime_str() {
-      return self::create_expires_datetime()->format(self::DATETIME_FORMAT);
+    static public function datetime_to_str(DateTime $datetime) {
+      return $datetime->format(self::DATETIME_FORMAT);
     }
+    
+    static public function expires_datetime() {
+      return (new DateTime('now', new DateTimeZone('UTC')))->sub(DateInterval::createFromDateString(self::LIFETIME_HOURS . ' hours'));
+    }
+
+    static public function recreate_datetime() {
+      return (new DateTime('now', new DateTimeZone('UTC')))->sub(DateInterval::createFromDateString(self::RECREATE_HOURS . ' hours'));
+    }
+    
 
     /**
      * @return 有効期限内のnonce、なければNULL
@@ -27,12 +34,36 @@ if (!class_exists( 'SimpleComments_NonceManager' ) ) {
       $wpdb->show_errors();
       return $wpdb->get_var($wpdb->prepare(
         'SELECT nonce FROM nonce WHERE author_ip= %s AND create_utc >= %s',
-        array($ip, self::create_expires_datetime_str())));
+        array($ip, self::datetime_to_str(self::expires_datetime()))));
     }
 
     static public function create_nonce(string $ip) {
       global $wpdb;
       $wpdb->show_errors();
+
+      // 作成 or 更新
+      $nonce = random_int(PHP_INT_MIN, PHP_INT_MAX);
+      $wpdb->query($wpdb->prepare(
+        "INSERT INTO nonce(author_ip, nonce) VALUES (%s, %d) 
+            ON DUPLICATE KEY UPDATE nonce = %d, create_utc=UTC_TIMESTAMP()",
+        array($ip, $nonce, $nonce)));
+      return $nonce;
+    }
+
+    /**
+     * DBのnonceがRECREATE_HOURS以内ならそれを返し、なければ作成する
+     */
+    static public function get_or_create_nonce(string $ip) {
+      global $wpdb;
+      $wpdb->show_errors();
+
+      // RECREATE_HOURS以内のnonceを返す
+      $nonce = $wpdb->get_var($wpdb->prepare(
+        'SELECT nonce FROM nonce WHERE author_ip= %s AND create_utc >= %s',
+        array($ip, self::datetime_to_str(self::recreate_datetime()))));
+      if(!empty($nonce)) {
+        return intval($nonce);
+      }
 
       // 作成 or 更新
       $nonce = random_int(PHP_INT_MIN, PHP_INT_MAX);
@@ -50,7 +81,7 @@ if (!class_exists( 'SimpleComments_NonceManager' ) ) {
       global $wpdb;
       $wpdb->show_errors();
       $wpdb->query($wpdb->prepare(
-        "DELETE FROM nonce WHERE create_utc < %s", self::create_expires_datetime_str()
+        "DELETE FROM nonce WHERE create_utc < %s", self::datetime_to_str(self::expires_datetime())
       ));
     }
     

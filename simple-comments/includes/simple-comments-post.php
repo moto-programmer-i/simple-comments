@@ -40,7 +40,8 @@ require_once( plugin_dir_path( __FILE__ ) . 'simple-comments-nonce-manager.php')
 nocache_headers();
 
 // 仮
-$ip = "192";
+// $ip = "192";
+$ip = SimpleComments_Utils::get_ip_address();
 
 // POSTされたデータは$_POSTに連想配列で入ってる
 // echo json_encode($_POST, JSON_PRETTY_PRINT);
@@ -98,9 +99,9 @@ $result = $wpdb->insert(
 	'simple_comments',
 	array(
         SimpleComments_Constants::POST_ID => $post_id,
-		SimpleComments_Constants::AUTHOR_IP => SimpleComments_Utils::sanitize($ip),
+		SimpleComments_Constants::AUTHOR_IP => $ip,
         SimpleComments_Constants::CONTENT => SimpleComments_Utils::sanitize($postdata[SimpleComments_Constants::CONTENT]),
-		// agent
+		SimpleComments_Constants::AGENT => SimpleComments_Utils::get_user_agent(),
 		SimpleComments_Constants::PARENT => $postdata[SimpleComments_Constants::PARENT],
     ),
 	array( '%d', '%s', '%s', '%d')
