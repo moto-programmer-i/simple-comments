@@ -39,7 +39,7 @@ if (!class_exists( 'SimpleComments_Plugin' ) ) {
             // An array of registered script handles this script depends on.
             array(),
             // ver 後でキャッシュのために追加
-            false,
+            '1.0',
             array(
               'strategy' => 'defer',
             )
@@ -50,6 +50,10 @@ if (!class_exists( 'SimpleComments_Plugin' ) ) {
           wp_enqueue_style(
             self::CSS_NAME,
             plugins_url('public/css/simple-comments.css', __FILE__ ),
+            // An array of registered stylesheet handles this stylesheet depends on.
+            array(),
+            // ver 後でキャッシュのために追加
+            '1.0'
           );
           
 
