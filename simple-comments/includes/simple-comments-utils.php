@@ -13,8 +13,20 @@ if (!class_exists( 'SimpleComments_Utils' ) ) {
     const USER_AGENT_MAX_LENGTH = 254;
 
     static function sanitize(string $str) {
-        // 指定したタグ以外は削除
-        return wp_kses($str, self::ALLOWED_HTML);
+      if (empty($str)) {
+        return '';
+      }
+		
+      // 指定したタグ以外は削除
+      $str = wp_kses($str, self::ALLOWED_HTML);
+
+      // 4連続以上の改行が無視されてしまうので、4つ目からは&nbsp;も挿入
+      return preg_replace_callback(
+        "/(\r?\n){3}((\r?\n)+)/",
+        function ($matches) {
+          return $matches[0] . preg_replace("/(\r?\n)/","&nbsp;$1",$matches[2]);
+        },
+        $str);
     }
 
     /**

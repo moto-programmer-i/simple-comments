@@ -1,5 +1,6 @@
 ALTER TABLE テーブル名 AUTO_INCREMENT = 1;
     ALTER TABLE simple_comments AUTO_INCREMENT = 1;
+    ALTER TABLE wp_posts AUTO_INCREMENT = 119;
 
 
 投稿メニュー
