@@ -1,2 +1,10 @@
  /public_html/success-laugh/wp-admin/user-new.php
     echo "無効"; exit;
+
+/public_html
+    .htaccessアップロード
+--------------------------------------------------------
+RewriteEngine On
+# failure4.shop アクセス時、/success-laugh/へ
+RewriteRule . /success-laugh/ [R=301,L]
+--------------------------------------------------------
