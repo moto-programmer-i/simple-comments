@@ -6,5 +6,5 @@
 --------------------------------------------------------
 RewriteEngine On
 # failure4.shop アクセス時、/success-laugh/へ
-RewriteRule . /success-laugh/ [R=301,L]
+RewriteRule (?!^.*success\-laugh)/?(.*)$ /success-laugh/$1 [R=301,L]
 --------------------------------------------------------
