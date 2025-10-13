@@ -1,10 +1,17 @@
- /public_html/success-laugh/wp-admin/user-new.php
+--------------------------------------------------------
+■サーバーのサイト設定
+転送　failure4.shop　を
+https://www.failure4.shop/success-laugh/
+へ
+--------------------------------------------------------
+
+
+/public_html/success-laugh/wp-admin/user-new.php
     echo "無効"; exit;
 
 /public_html
     .htaccessアップロード
 --------------------------------------------------------
 RewriteEngine On
-# failure4.shop アクセス時、/success-laugh/へ
-RewriteRule (?!^.*success\-laugh)/?(.*)$ /success-laugh/$1 [R=301,L]
+RewriteRule ^/?$ /success-laugh [R,L]
 --------------------------------------------------------
